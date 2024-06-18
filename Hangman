@@ -1,0 +1,126 @@
+import random
+import os
+import string
+
+
+def clear_console():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def print_hangman(wrong):
+    print("Welcome To Hangman Game")
+    print("-----*-----*-----*-----")
+
+    hangman_stages = [
+        """
+         +--------+
+                  |
+                  |
+                  |
+        ===========
+        """,
+        """
+         +--------+
+         0        |
+                  |
+                  |
+        ===========
+        """,
+        """
+         +--------+
+         0        |
+         |        |
+                  |
+        ===========
+        """,
+        """
+         +--------+
+         0        |
+        /|        |
+                  |
+        ===========
+        """,
+        """
+         +--------+
+         0        |
+        /|\       |
+                  |
+        ===========
+        """,
+        """
+         +--------+
+         0        |
+        /|\       |
+        /         |
+        ===========
+        """,
+        """
+         +--------+
+         0        |
+        /|\       |
+        / \       |
+        ===========
+        """
+    ]
+    print(hangman_stages[wrong])
+
+def print_word(random_word, guessed_letters):
+    display_word = ''
+    for letter in random_word:
+        if letter in guessed_letters:
+         display_word += letter + ' '
+        else:
+         display_word += '_ '
+    print(display_word)
+    return display_word.count('_') == 0
+
+def load_words(file_path):
+        with open(file_path, "r") as file:
+         words = [line.strip() for line in file]
+        return words
+
+def get_common_letter(guessed_letters):
+    frequency_order = 'etaoinshrdlcumwfgypbvkjxqz'
+    for letter in frequency_order:
+        if letter not in guessed_letters:
+         return letter
+    return None
+    
+
+def main():
+    words = load_words("/home/workspace/my-project/.vscode/hangman/words_250000_train.txt")
+    random_word = random.choice(words)
+
+    guessed_letters = []
+    wrong_guesses = 0
+
+    while wrong_guesses < 6:
+        clear_console()
+        print_hangman(wrong_guesses)
+        if print_word(random_word, guessed_letters):
+         print("Congratulations! You have guessed the word correctly!")
+         bbreak
+        print("\nLetters guessed so far: ", ' '.join(guessed_letters))
+
+        if wrong_guesses >= 4:
+         suggested_letter = get_common_letter(guessed_letters)
+         print(f"Suggested letter: {suggested_letter}")
+
+        guess = input("Guess a letter: ").lower()
+        if len(guess) != 1 or not guess.isalpha():
+         print("Invalid input. enter a single alphabet.")
+         continue
+        if guess in guessed_letters:
+         print("You have already guessed that letter.")
+         continue
+
+        guessed_letters.append(guess)
+        if guess not in random_word:
+         wrong_guesses += 1
+    
+    if wrong_guesses == 6:
+        clear_console()
+        print_hangman(wrong_guesses)
+        print(f"Game over! The word was '{random_word}'.")
+
+if __name__ == "__main__":
+    main()
